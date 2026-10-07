@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 330 72" width="330" height="72">
+  <title>Chocolate Near You</title>
+  <defs><clipPath id="t"><circle cx="35" cy="31" r="14.5"/></clipPath></defs>
+  <g transform="translate(4 4)">
+    <path d="M31 62S8 39.5 8 26a23 23 0 0 1 46 0c0 13.5-23 36-23 36z" fill="#4A2C1D"/>
+    <circle cx="31" cy="27" r="14.5" fill="#7A4A2C"/>
+  </g>
+  <g clip-path="url(#t)" fill="none" stroke="#EAD3A6" stroke-width="2.6" stroke-linecap="round">
+    <path d="M18 25c4.3-3.4 8.6 3.4 12.9 0s8.6-3.4 12.9 0 8.6 3.4 12.9 0"/>
+    <path d="M18 32c4.3-3.4 8.6 3.4 12.9 0s8.6-3.4 12.9 0 8.6 3.4 12.9 0"/>
+    <path d="M18 39c4.3-3.4 8.6 3.4 12.9 0s8.6-3.4 12.9 0 8.6 3.4 12.9 0"/>
+  </g>
+  <path d="M59 6.5l1.7 4.6 4.6 1.7-4.6 1.7L59 19.1l-1.7-4.6-4.6-1.7 4.6-1.7z" fill="#B88A44"/>
+  <text x="78" y="38" font-family="Fraunces, Georgia, 'Times New Roman', serif" font-size="30" font-weight="700" fill="#2A1810">Chocolate</text>
+  <text x="80" y="60" font-family="Inter, Helvetica, Arial, sans-serif" font-size="13" font-weight="600" letter-spacing="4.5" fill="#B88A44">NEAR YOU</text>
+</svg>

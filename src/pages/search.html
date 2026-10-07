@@ -1,0 +1,20 @@
+<!--meta
+{
+  "path": "/search/",
+  "title": "Search Chocolate Shops, Cities and States",
+  "description": "Search {{STAT_LISTINGS}} chocolate shops, chocolatiers and candy stores by name, city or state. Results link straight to opening hours, phone numbers and directions.",
+  "h1": "Search the Directory",
+  "lede": "Type a shop name, a city or a state.",
+  "nav": "search",
+  "layout": "wide",
+  "trail": [{ "label": "Search" }],
+  "scripts": ["search.js"]
+}
+-->
+<div class="search-box">
+  <label class="visually-hidden" for="site-search-input">Search shops, cities and states</label>
+  <input id="site-search-input" type="search" placeholder="Search by shop name, city or state" autocomplete="off">
+</div>
+<p class="small" id="site-search-status">Start typing to search {{STAT_LISTINGS}} shops.</p>
+<ol class="search-results" id="site-search-results"></ol>
+<noscript><p>Search needs JavaScript. You can still <a href="/states/">browse by state</a>.</p></noscript>

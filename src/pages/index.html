@@ -1,0 +1,84 @@
+<!--meta
+{
+  "path": "/",
+  "title": "Chocolate Near Me: Find Chocolate Shops Near You",
+  "description": "Chocolate near me, sorted: {{STAT_LISTINGS}} chocolate shops, chocolatiers and candy stores ranked by Google rating, with hours, phone numbers and free directions.",
+  "h1": "Chocolate Near Me",
+  "nav": "home",
+  "layout": "raw",
+  "bodyClass": "home",
+  "scripts": ["near-me.js"]
+}
+-->
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="eyebrow">{{STAT_LISTINGS}} shops in {{STAT_STATES}} states</p>
+      <h1>Chocolate Near Me: Find Chocolate Shops Near You</h1>
+      <p class="lede">Chocolatiers, chocolate shops and candy stores across the United States, ranked by Google rating, with hours, phone numbers, addresses and directions for every one.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary btn-lg" type="button" data-near-me>Use my location</button>
+        <a class="btn btn-outline btn-lg" href="/states/">Browse by state</a>
+      </div>
+      <form class="hero-search" action="/search/" method="get" role="search">
+        <label class="visually-hidden" for="hero-q">Search shops, cities or states</label>
+        <input id="hero-q" name="q" type="search" placeholder="Search a shop, city or state" autocomplete="off">
+        <button class="btn btn-dark" type="submit">Search</button>
+      </form>
+      <p class="near-me-status" data-near-me-status aria-live="polite"></p>
+    </div>
+    <figure class="hero-media">{{HERO_IMAGE}}</figure>
+  </div>
+</section>
+
+<section class="section near-me-results" data-near-me-results hidden>
+  <div class="wrap">
+    <h2>Chocolate shops closest to you</h2>
+    <ol class="card-grid near-list" data-near-me-list></ol>
+    <p class="small">Distances are straight-line from your device's location, which never leaves your browser.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <h2>Find chocolate by state</h2>
+    <p>Pick your state for a ranked list of every chocolate shop we track there, with a city-by-city breakdown.</p>
+    {{STATE_GRID}}
+  </div>
+</section>
+
+<div class="wrap">{{AD_DISPLAY}}</div>
+
+<section class="section section-alt">
+  <div class="wrap">
+    <h2>Browse by speciality</h2>
+    <p>Looking for something specific? These tags come from each shop's own Google category and description.</p>
+    {{CATEGORY_CHIPS}}
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <h2>Top-rated chocolate shops in the directory</h2>
+    <p>The highest weighted ratings nationwide. Weighted means a shop needs real review volume before a perfect score counts in full.</p>
+    {{TOP_RATED}}
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="wrap">
+    <h2>From the blog</h2>
+    {{BLOG_TEASERS_HOME}}
+    <p><a href="/blog/">All articles</a></p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap-narrow prose">
+    <h2>Chocolate near me: questions people ask</h2>
+    {{FAQ}}
+    <h2>Why this directory exists</h2>
+    <p>Searching for chocolate nearby usually returns a map full of pins with no way to compare them. We pull public business data for every chocolate shop, chocolatier and candy store we can find, rank each state and city, and show the details you need in one place.</p>
+    <p>When a detail is missing, we say so instead of guessing. Read more <a href="/about/">about how the directory works</a>.</p>
+  </div>
+</section>

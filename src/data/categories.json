@@ -1,0 +1,72 @@
+[
+  {
+    "slug": "truffles",
+    "feature": "Truffles and bonbons",
+    "name": "Truffles and Bonbons",
+    "short": "Truffles",
+    "intro": "Truffles and bonbons are the heart of most chocolatier counters: a ganache or praline centre, either rolled and dusted or enrobed in a tempered shell. Because fresh ganache has a short shelf life, shops that make their own usually sell them by the piece or in small boxes, and the best way to judge a counter is to buy two or three and taste them the same day."
+  },
+  {
+    "slug": "artisan-chocolatiers",
+    "feature": "Artisan chocolate",
+    "name": "Artisan Chocolatiers",
+    "short": "Artisan",
+    "intro": "Artisan chocolatiers make their own confections in small batches rather than reselling mass-produced boxes, and some go further and make chocolate from the bean. Google tags these shops as chocolate artisans. Ask at the counter what is made in house and which bars or bonbons are freshest that day."
+  },
+  {
+    "slug": "fudge",
+    "feature": "Fudge",
+    "name": "Fudge Shops",
+    "short": "Fudge",
+    "intro": "Fudge is cooked sugar, butter and milk, beaten as it cools so it sets into fine crystals with a soft, dense bite. Shops that make it on site often cut it to order from a slab, and many sell by weight, so it is easy to try a small piece of several flavours."
+  },
+  {
+    "slug": "hot-chocolate",
+    "feature": "Hot chocolate and cafe",
+    "name": "Hot Chocolate and Chocolate Cafes",
+    "short": "Hot chocolate",
+    "intro": "Chocolate cafes pair a retail counter with somewhere to sit, and the drink to order is usually a drinking chocolate made from melted chocolate rather than cocoa powder. It is richer and thicker than a standard hot cocoa, so many cafes serve it in a smaller cup."
+  },
+  {
+    "slug": "candy-stores",
+    "feature": "Candy and confections",
+    "name": "Candy and Confectionery Stores",
+    "short": "Candy",
+    "intro": "Candy and confectionery stores carry chocolate alongside everything else sweet: brittles, caramels, taffy and nostalgic brands. They are a good stop when you are buying for a group with different tastes, and many keep a bulk section sold by weight."
+  },
+  {
+    "slug": "chocolate-dipped",
+    "feature": "Chocolate-dipped treats",
+    "name": "Chocolate-Dipped Strawberries and Treats",
+    "short": "Dipped treats",
+    "intro": "Chocolate-dipped strawberries, pretzels and dried fruit are made close to sale because fresh fruit does not keep. Shops that specialise in them usually take advance orders around holidays, so ordering a day or two ahead is the safest plan for a specific date."
+  },
+  {
+    "slug": "gift-shops",
+    "feature": "Gifts",
+    "name": "Chocolate and Candy Gift Shops",
+    "short": "Gifts",
+    "intro": "Many chocolate and candy shops double as gift shops, with boxed assortments, baskets and corporate orders. If you need a set number of boxes or a delivery date, call ahead: hand-packed orders take time during holiday weeks."
+  },
+  {
+    "slug": "tours-and-classes",
+    "feature": "Tours, tastings and classes",
+    "name": "Chocolate Tours, Tastings and Classes",
+    "short": "Tours and classes",
+    "intro": "Some chocolate makers open their kitchens for guided tastings, factory tours or hands-on classes such as truffle rolling. These are usually ticketed and capped in size, so check the business's own website for dates and booking rather than turning up on spec."
+  },
+  {
+    "slug": "vegan-chocolate",
+    "feature": "Vegan and dietary options",
+    "name": "Vegan and Dietary-Friendly Chocolate",
+    "short": "Vegan and dietary",
+    "intro": "Plain dark chocolate is often dairy free, but many bars are made on shared equipment with milk, nuts or gluten. If you have an allergy, ask the shop directly about ingredients and cross-contact rather than relying on a tag in a directory."
+  },
+  {
+    "slug": "ice-cream",
+    "feature": "Ice cream and gelato",
+    "name": "Chocolate Shops with Ice Cream and Gelato",
+    "short": "Ice cream",
+    "intro": "Plenty of chocolate shops run an ice cream or gelato counter, especially in tourist towns and in summer. Expect the chocolate flavours to use the shop's own chocolate, which is a good low-cost way to taste what they make."
+  }
+]

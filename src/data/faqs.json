@@ -1,0 +1,26 @@
+[
+  {
+    "q": "How do I find chocolate near me?",
+    "a": "Tap \"Use my location\" at the top of this page to see the closest chocolate shops in our directory, or open your state from the list below. Each state page ranks every shop we track there by Google rating and review count, with hours, phone numbers and addresses."
+  },
+  {
+    "q": "How are the shops ranked?",
+    "a": "By a weighted rating: each shop's Google average is pulled toward the overall average until it has enough reviews to stand on its own, so a 4.8 from 900 reviews ranks above a 5.0 from three. No business pays to be listed or to move up. Shops with no rating on file appear after rated ones."
+  },
+  {
+    "q": "Are the hours on this site accurate?",
+    "a": "Hours come from each business's public Google listing at the time of our last data refresh. Holiday weeks change them often, especially around Valentine's Day, Easter and December, so call before making a special trip. If a listing has no hours on file, the page says so rather than guessing."
+  },
+  {
+    "q": "What is the difference between a chocolatier and a chocolate maker?",
+    "a": "A chocolate maker turns cocoa beans into chocolate: roasting, grinding and refining. A chocolatier works with finished chocolate to make truffles, bonbons and other confections. Some businesses do both. Our artisan chocolate filter highlights shops that Google lists as chocolate artisans."
+  },
+  {
+    "q": "How should I store chocolate I buy from a shop?",
+    "a": "Somewhere cool, dark and dry, ideally 60 to 68 degrees Fahrenheit, wrapped tightly and away from strong smells. Avoid the fridge for solid bars because condensation causes sugar bloom. Fresh cream truffles are the exception: eat them within a week or two, or follow the shop's own advice."
+  },
+  {
+    "q": "My favourite shop is missing or the details are wrong. How do I fix it?",
+    "a": "Use the contact page to send the business name, city and the correction. We review every message, and listing details are refreshed from public data on a regular schedule."
+  }
+]

@@ -1,0 +1,20 @@
+{
+  "name": "chocolatenearyou",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static directory of chocolate shops, chocolatiers and candy stores across the US.",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "verify": "node scripts/verify.mjs",
+    "test": "node scripts/build.mjs && node scripts/verify.mjs",
+    "dev": "node scripts/build.mjs && node scripts/serve.mjs",
+    "serve": "node scripts/serve.mjs",
+    "import": "node scripts/import-outscraper.mjs",
+    "sample-data": "node scripts/make-sample-data.mjs",
+    "icons": "node scripts/make-icons.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
