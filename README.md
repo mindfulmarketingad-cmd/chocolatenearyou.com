@@ -175,11 +175,20 @@ Blog guides go in `src/pages/blog/` with `slug`, `date`, `excerpt` and
 `readingTime` instead of `path`. Keep them informational. Local "near me"
 intent belongs to the state pages.
 
-### Homepage banner
+### Featured images and the homepage hero
 
-Put the banner photo at `src/assets/img/hero-chocolate.jpg` (portrait,
-1333x2000 or similar). The build picks it up automatically. Until then the
-hero shows the logo mark.
+Every page carries a featured image, and `npm run verify` fails if one is
+missing. It is always a photo from one of our own listings, shown with a
+"Pictured: shop" credit that links to the listing (an extra internal link):
+
+- state, city, map and speciality pages use the top-ranked shop on that page that has a photo
+- blog lists use their top shop's photo; guides and static pages pick deterministically from the top 300 photos
+- the homepage hero background is the most-reviewed shop rated 4.7 or higher with a live photo (`heroListing()`)
+
+All of these are Google photo URLs, so they follow the expiry rule above:
+after 25 days, or if Google refuses the URL, pages fall back to the local
+illustrations, and the hero and tiles fall back to a chocolate gradient.
+Re-import monthly to keep them photographic.
 
 ---
 
@@ -196,7 +205,6 @@ hero shows the logo mark.
 
 ## Before going live
 
-- [ ] Add the homepage banner at `src/assets/img/hero-chocolate.jpg`
 - [ ] Confirm the social profile URLs in `SOCIAL` (build.mjs) exist, or change them
 - [ ] Point `CONTACT_EMAIL` at a mailbox you monitor
 - [ ] Submit `https://chocolatenearyou.com/sitemap.xml` in Search Console

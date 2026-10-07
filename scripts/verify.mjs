@@ -7,7 +7,7 @@
  * page without exactly one <h1> or a canonical, an indexable title of 60+
  * characters or description outside 150-160, a target="_blank" link without
  * rel="noopener", an emoji anywhere, an unfilled {{TOKEN}}, or an ads.txt
- * that differs from the expected line.
+ * that differs from the expected line, or a page without a featured image.
  */
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
@@ -52,6 +52,7 @@ for (const file of files) {
   if (rel !== '/404.html' && !/<link rel="canonical" href="https:\/\/chocolatenearyou\.com\/[^"]*">/.test(html)) errors.push(`${rel}: missing canonical`);
 
   if (!isStub) {
+    if (rel !== '/404.html' && !/class="(feature|detail-hero|hero)"/.test(html)) errors.push(`${rel}: no featured image`);
     const h1s = (html.match(/<h1[\s>]/g) || []).length;
     if (h1s !== 1) errors.push(`${rel}: ${h1s} h1 tags`);
     const title = (html.match(/<title>([^<]*)<\/title>/) || [])[1] || '';

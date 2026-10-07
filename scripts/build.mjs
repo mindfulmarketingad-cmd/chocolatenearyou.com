@@ -299,6 +299,37 @@ function listingImage(l, size = 'card', { eager = false } = {}) {
   return `<img src="${attr(src)}" alt="${attr(altText)}" width="${preset.width}" height="${preset.height}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"${photo ? ` referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${fallback}';this.alt='';"` : ''}>`;
 }
 
+/* ------------------------------------------------------- featured images
+   Every page carries a featured image. It is always a photo from one of
+   our own listings (credited and linked, which doubles as an internal
+   link), chosen from the page's own shops where it has any. When no
+   photo is usable the local illustration stands in. */
+
+function photoListing(items) {
+  return items.find((l) => usablePhoto(l)) || null;
+}
+let photoPool = null;
+function poolListing(seed) {
+  if (!photoPool) photoPool = rankListings(listings.filter((l) => usablePhoto(l) && !l.sample)).slice(0, 300);
+  return photoPool.length ? photoPool[seededHash(seed) % photoPool.length] : null;
+}
+
+function featureFigure(l, seed = '') {
+  if (!l) {
+    const fb = FALLBACK_IMAGES[seededHash(seed) % FALLBACK_IMAGES.length];
+    return `<figure class="feature"><img src="${fb}" alt="" width="960" height="640" fetchpriority="high" decoding="async"></figure>`;
+  }
+  return `<figure class="feature"><a href="${l.url}" tabindex="-1" aria-hidden="true">${listingImage(l, 'hero', { eager: true })}</a><figcaption>Pictured: <a href="${l.url}">${esc(l.name)}</a>, ${esc(l.city)}, ${esc(l.stateCode)}</figcaption></figure>`;
+}
+
+/** Full-bleed background photo (hero, tiles). If Google refuses the URL
+ *  the image removes itself and the chocolate gradient underneath shows. */
+function bgImage(l, width = 1600, height = 900, eager = false) {
+  const photo = l && usablePhoto(l);
+  if (!photo) return '';
+  return `<img class="bg-img" src="${attr(resizedPhotoUrl(photo, { width, height }))}" alt="" width="${width}" height="${height}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">`;
+}
+
 /* --------------------------------------------------------------- ranking */
 
 const ratedListings = listings.filter((l) => l.rating && l.reviews);
@@ -409,7 +440,10 @@ const stats = { listings: listings.length, states: byState.size, cities: byCity.
 function ratingHtml(l, { long = false } = {}) {
   if (!l.rating) return '<span class="rating rating-none">No Google rating on file</span>';
   const pct = Math.max(0, Math.min(100, (l.rating / 5) * 100)).toFixed(0);
-  const count = l.reviews ? ` <span class="rating-count">(${plural(l.reviews, 'Google review', 'Google reviews')})</span>` : '';
+  const label = l.reviews ? `(${plural(l.reviews, 'Google review', 'Google reviews')})` : '';
+  const count = !label ? '' : l.mapsUrl
+    ? ` <a class="rating-count" href="${attr(l.mapsUrl)}" ${EXT}>${label}</a>`
+    : ` <span class="rating-count">${label}</span>`;
   return `<span class="rating"><span class="stars" style="--pct:${pct}%" role="img" aria-label="Rated ${l.rating.toFixed(1)} out of 5"></span><b>${l.rating.toFixed(1)}</b>${long ? ' out of 5' : ''}${count}</span>`;
 }
 
@@ -432,7 +466,7 @@ const EXT = 'target="_blank" rel="nofollow noopener noreferrer"';
 
 function factsList(l) {
   return `<dl class="facts">
-  <div><dt>Address</dt><dd>${hasStreetAddress(l) ? esc(addressOf(l)) : '<span class="missing">Street address not listed</span>'}</dd></div>
+  <div><dt>Address</dt><dd>${hasStreetAddress(l) ? `<a href="${directionsUrl(l)}" ${EXT}>${esc(addressOf(l))}</a>` : '<span class="missing">Street address not listed</span>'}</dd></div>
   <div><dt>Phone</dt><dd>${l.phone ? `<a href="${telHref(l.phone)}">${esc(l.phone)}</a>` : '<span class="missing">Not listed</span>'}</dd></div>
   <div><dt>Website</dt><dd>${l.website ? `<a href="${attr(l.website)}" ${EXT}>${esc(websiteLabel(l.website))}</a>` : '<span class="missing">Not listed</span>'}</dd></div>
   <div><dt>Hours</dt><dd>${hoursCompact(l)}</dd></div>
@@ -731,16 +765,26 @@ function splitLongParagraphs(html) {
 const sitemapEntries = [];
 const pageReport = [];
 
+function pageHead(meta, { feature = meta.feature || '', notice = '', after = '' } = {}) {
+  return `<div class="page-head${feature ? ' has-feature' : ''}">
+  <div class="wrap page-head-grid">
+    <div class="page-head-copy">
+      ${breadcrumbs(meta.trail)}
+      ${notice}
+      ${meta.eyebrow ? `<p class="eyebrow">${meta.eyebrow}</p>` : ''}
+      <h1>${esc(meta.h1 || meta.title)}</h1>
+      ${meta.lede ? `<p class="lede">${meta.lede}</p>` : ''}
+      ${after}
+    </div>
+    ${feature}
+  </div>
+</div>`;
+}
+
 function layoutContent(meta, body) {
   const layout = meta.layout || 'prose';
   if (layout === 'raw') return body;
-  const head = `<div class="page-head">
-  <div class="${layout === 'wide' ? 'wrap' : 'wrap-narrow'}">
-    ${breadcrumbs(meta.trail)}
-    <h1>${esc(meta.h1 || meta.title)}</h1>
-    ${meta.lede ? `<p class="lede">${meta.lede}</p>` : ''}
-  </div>
-</div>`;
+  const head = pageHead(meta);
   return `${head}
 <div class="section">
   <div class="${layout === 'wide' ? 'wrap' : 'wrap-narrow prose'}">
@@ -767,6 +811,7 @@ function render(meta, body, opts = {}) {
     '{{CONTENT}}': content,
     '{{YEAR}}': String(new Date().getFullYear()),
     '{{ASSET_VERSION}}': ASSET_VERSION,
+    '{{ANNOUNCE}}': `<a href="/states/">${num(stats.listings)} chocolate shops ranked across ${num(stats.states)} states</a><span aria-hidden="true">&#10022;</span><span>Updated ${MONTH_YEAR}</span>`,
     '{{SOCIAL_INSTAGRAM}}': SOCIAL.instagram,
     '{{SOCIAL_TWITTER}}': SOCIAL.twitter,
     '{{SOCIAL_FACEBOOK}}': SOCIAL.facebook,
@@ -809,15 +854,18 @@ mkdirSync(DIST, { recursive: true });
 /* --- blog posts (informational only: no local "near me" intent) ---------- */
 
 const posts = readPageFiles(join(SRC, 'pages/blog'))
-  .map((p) => ({ ...p, meta: { ...p.meta, path: `/blog/${p.meta.slug}/` } }))
+  .map((p) => ({ ...p, meta: { ...p.meta, path: `/blog/${p.meta.slug}/` }, photo: poolListing(p.meta.slug) }))
   .sort((a, b) => (b.meta.date || '').localeCompare(a.meta.date || ''));
 
 function blogTeasers(list) {
   return `<div class="post-grid">
 ${list.map((p) => `  <article class="post-card">
+    <div class="post-card-media">${p.photo ? listingImage(p.photo, 'card') : `<img src="${FALLBACK_IMAGES[seededHash(p.meta.slug) % FALLBACK_IMAGES.length]}" alt="" width="480" height="320" loading="lazy">`}</div>
+    <div class="post-card-body">
     <p class="post-card-meta">${esc(new Date(`${p.meta.date}T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' }))} &middot; ${esc(p.meta.readingTime)}</p>
     <h3><a href="${p.meta.path}">${esc(p.meta.h1 || p.meta.title)}</a></h3>
     <p>${esc(p.meta.excerpt)}</p>
+    </div>
   </article>`).join('\n')}
 </div>`;
 }
@@ -829,6 +877,8 @@ for (const post of posts) {
     layout: 'prose',
     ogType: 'article',
     schemaType: 'WebPage',
+    eyebrow: 'Chocolate guide',
+    feature: featureFigure(post.photo, post.meta.slug),
     trail: [{ label: 'Blog', href: '/blog/' }, { label: post.meta.h1 || post.meta.title }],
   };
   const dateLabel = new Date(`${meta.date}T12:00:00Z`).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
@@ -940,6 +990,8 @@ for (const post of listiclePosts) {
     layout: 'prose',
     nav: 'blog',
     ogType: 'article',
+    eyebrow: `${esc(stateName)} &middot; ${SEASON_YEAR} list`,
+    feature: featureFigure(photoListing(top) || photoListing(pool), path),
     trail: [{ label: 'Blog', href: '/blog/' }, { label: h1 }],
   };
   const hub = statePath(stateName);
@@ -1268,10 +1320,10 @@ for (const stateName of stateNames) {
   const lede = `Every chocolate shop, chocolatier and confectioner we track in ${esc(stateName)}, ranked by Google rating weighted by review count. ${f.cities.length > 1 ? `They span ${plural(f.cities.length, 'city', 'cities')}, led by ${esc(f.cities[0].city)} with ${num(f.cities[0].items.length)}.` : `All are in ${esc(f.cities[0].city)}.`} Each entry has hours, phone, address and website, or says plainly when one is not listed.`;
 
   const statStrip = `<ul class="stat-strip">
-  <li><b>${num(n)}</b><span>${n === 1 ? 'shop' : 'shops'} listed</span></li>
-  <li><b>${num(f.cities.length)}</b><span>${f.cities.length === 1 ? 'city' : 'cities'}</span></li>
-  <li><b>${avgRating ? avgRating.toFixed(1) : 'n/a'}</b><span>average rating</span></li>
-  <li><b>${f.withHours.length ? `${num(f.sunday.length)}` : 'n/a'}</b><span>open Sundays</span></li>
+  <li><a href="#ranked"><b>${num(n)}</b><span>${n === 1 ? 'shop' : 'shops'} listed</span></a></li>
+  <li><a href="#cities"><b>${num(f.cities.length)}</b><span>${f.cities.length === 1 ? 'city' : 'cities'}</span></a></li>
+  <li><a href="#ranked"><b>${avgRating ? avgRating.toFixed(1) : 'n/a'}</b><span>average rating</span></a></li>
+  <li><a href="#glance"><b>${f.withHours.length ? `${num(f.sunday.length)}` : 'n/a'}</b><span>open Sundays</span></a></li>
 </ul>`;
 
   const rich = items.slice(0, STATE_RICH_ENTRIES).map((l, i) => renderEntry(l, i + 1));
@@ -1287,15 +1339,11 @@ for (const stateName of stateNames) {
   const noHours = items.filter((l) => !l.hours).length;
   if (noHours) glance.push(`<li>${num(noHours)} of ${num(n)} listings have no hours on file. Those entries say so, so call ahead.</li>`);
 
-  const body = `<div class="page-head">
-  <div class="wrap">
-    ${breadcrumbs(meta.trail)}
-    ${real === 0 ? '<p class="notice">Placeholder data: every listing on this page is a stand-in until the real Outscraper export is imported. This page is hidden from search engines until then.</p>' : ''}
-    <h1>${esc(meta.h1)}</h1>
-    <p class="lede">${lede}</p>
-    ${statStrip}
-  </div>
-</div>
+  const body = `${pageHead({ ...meta, lede, eyebrow: `${esc(stateName)} &middot; Updated ${MONTH_YEAR}` }, {
+    feature: featureFigure(photoListing(items), path),
+    notice: real === 0 ? '<p class="notice">Placeholder data: every listing on this page is a stand-in until the real Outscraper export is imported. This page is hidden from search engines until then.</p>' : '',
+    after: statStrip,
+  })}
 <div class="section">
   <div class="wrap">
     <nav class="jump" aria-label="Browse ${attr(stateName)}">
@@ -1314,7 +1362,7 @@ ${listWithAds([...rich, ...compact])}
 ${renderAdSlot('display').replace('class="ad-slot', 'class="wrap ad-slot')}
 <div class="section section-alt">
   <div class="wrap">
-    <h2>Chocolate shops by city in ${esc(stateName)}</h2>
+    <h2 id="cities">Chocolate shops by city in ${esc(stateName)}</h2>
     <ul class="city-grid">
 ${f.cities.map((c) => `      <li><a href="${cityPath(stateName, c.city)}">${esc(c.city)}</a> <span>${num(c.items.length)}</span></li>`).join('\n')}
     </ul>
@@ -1322,7 +1370,7 @@ ${f.cities.map((c) => `      <li><a href="${cityPath(stateName, c.city)}">${esc(
 </div>
 <div class="section">
   <div class="wrap-narrow prose">
-    <h2>${esc(stateName)} chocolate at a glance</h2>
+    <h2 id="glance">${esc(stateName)} chocolate at a glance</h2>
     <ul>
 ${glance.join('\n')}
     </ul>
@@ -1393,15 +1441,12 @@ for (const [key, items] of byCity) {
   const presentCats = categories.map((c) => ({ c, n: withFeature(items, c).length })).filter((x) => x.n);
   const top = items.find((l) => l.rating && !l.sample);
 
-  const body = `<div class="page-head">
-  <div class="wrap">
-    ${breadcrumbs(meta.trail)}
-    ${real === 0 ? '<p class="notice">Placeholder data: these listings are stand-ins until the real Outscraper export is imported.</p>' : ''}
-    <h1>${esc(meta.h1)}</h1>
-    <p class="lede">${n === 1 ? `The one chocolate shop we track in ${esc(cityName)} so far` : `All ${num(n)} chocolate shops we track in ${esc(cityName)}`}, ranked by Google rating weighted by review count.${top ? ` ${esc(top.name)} currently leads with a ${top.rating.toFixed(1)}.` : ''} Hours, phone numbers, addresses and websites are below, and missing details are marked as missing.</p>
-    ${presentCats.length ? `<ul class="chips">${presentCats.map(({ c, n: cn }) => `<li><a class="chip" href="${findStatePath(c, stateName)}">${esc(c.short)} <span>${num(cn)}</span></a></li>`).join('')}</ul>` : ''}
-  </div>
-</div>
+  const cityLede = `${n === 1 ? `The one chocolate shop we track in ${esc(cityName)} so far` : `All ${num(n)} chocolate shops we track in ${esc(cityName)}`}, ranked by Google rating weighted by review count.${top ? ` ${esc(top.name)} currently leads with a ${top.rating.toFixed(1)}.` : ''} Hours, phone numbers, addresses and websites are below, and missing details are marked as missing.`;
+  const body = `${pageHead({ ...meta, lede: cityLede, eyebrow: `${esc(cityName)}, ${esc(stateName)}` }, {
+    feature: featureFigure(photoListing(items) || photoListing(byState.get(stateName)), path),
+    notice: real === 0 ? '<p class="notice">Placeholder data: these listings are stand-ins until the real Outscraper export is imported.</p>' : '',
+    after: presentCats.length ? `<ul class="chips">${presentCats.map(({ c, n: cn }) => `<li><a class="chip" href="${findStatePath(c, stateName)}">${esc(c.short)} <span>${num(cn)}</span></a></li>`).join('')}</ul>` : '',
+  })}
 <div class="section">
   <div class="wrap">
     ${n > 3 ? hubToolbar(items, { cityFilter: false }) : ''}
@@ -1449,6 +1494,8 @@ for (const cat of presentCategories) {
     h1: `${cat.name} Near Me`,
     lede: esc(cat.intro),
     layout: 'wide',
+    eyebrow: 'Speciality',
+    feature: featureFigure(photoListing(all), cat.slug),
     noindex: realCount(all) === 0,
     schemaType: 'CollectionPage',
     trail: [{ label: 'Find', href: '/find/' }, { label: cat.name }],
@@ -1479,6 +1526,8 @@ ${listWithAds(top.map((l, i) => renderCompactEntry(l, i + 1)))}
       h1: `${cat.name} Near Me in ${s}`,
       lede: `${n === 1 ? 'The one shop' : `All ${num(n)} shops`} in our ${esc(s)} directory whose Google category or description points to ${esc(cat.short.toLowerCase())}, ranked by weighted rating. ${esc(cat.intro.split('. ')[0])}.`,
       layout: 'wide',
+      eyebrow: `${esc(cat.short)} &middot; ${esc(s)}`,
+      feature: featureFigure(photoListing(items) || photoListing(byState.get(s)), `${cat.slug}${s}`),
       noindex: realCount(items) < FIND_STATE_INDEX_MIN,
       schemaType: 'CollectionPage',
       trail: [{ label: 'Find', href: '/find/' }, { label: cat.name, href: findPath(cat) }, { label: s }],
@@ -1518,6 +1567,8 @@ for (const stateName of stateNames) {
     h1: `Map of Chocolate Shops in ${stateName}`,
     lede: `Every shop in our ${esc(stateName)} directory on one map. For hours and rankings, see the <a href="${statePath(stateName)}">${esc(stateName)} chocolate shop list</a>.`,
     layout: 'wide',
+    eyebrow: `${esc(stateName)} map`,
+    feature: featureFigure(photoListing(items), `map${stateName}`),
     noindex: realCount(items) === 0,
     trail: [{ label: 'Map', href: '/map/' }, { label: stateName }],
   };
@@ -1557,6 +1608,34 @@ ${list.map((l) => `  <li class="card"><a class="card-media" href="${l.url}" tabi
 </ol>`;
 }
 
+// Hero background: the best-reviewed highly rated shop that has a live
+// photo. Rebuilt with every import, so it rotates as the data changes.
+function heroListing() {
+  const pool = listings.filter((l) => !l.sample && usablePhoto(l) && (l.rating || 0) >= 4.7);
+  return pool.sort((a, b) => (b.reviews || 0) - (a.reviews || 0))[0] || photoListing(rankListings(listings));
+}
+
+function specialityCircles() {
+  return `<ul class="circles">
+${presentCategories.map((c) => {
+    const items = rankListings(withFeature(listings, c));
+    const l = photoListing(items);
+    const img = l ? listingImage(l, 'thumb') : `<img src="${FALLBACK_IMAGES[seededHash(c.slug) % FALLBACK_IMAGES.length]}" alt="" width="320" height="220" loading="lazy">`;
+    return `  <li><a href="${findPath(c)}"><span class="circle-img">${img}</span><span class="circle-label">${esc(c.short)}</span><span class="circle-count">${plural(items.length, 'shop', 'shops')}</span></a></li>`;
+  }).join('\n')}
+</ul>`;
+}
+
+function featuredStates(count = 6) {
+  const top = [...stateNames].sort((a, b) => byState.get(b).length - byState.get(a).length).slice(0, count);
+  return `<ul class="tiles">
+${top.map((st) => {
+    const items = byState.get(st);
+    return `  <li class="tile"><a href="${statePath(st)}">${bgImage(photoListing(items), 900, 600)}<span class="tile-copy"><span class="tile-kicker">${plural(items.length, 'shop', 'shops')}</span><span class="tile-title">${esc(st)}</span><span class="tile-cta">Explore the list</span></span></a></li>`;
+  }).join('\n')}
+</ul>`;
+}
+
 function htmlSitemap() {
   return `<h2>Main pages</h2>
 <ul class="link-list cols">
@@ -1585,20 +1664,23 @@ const tokens = {
   '{{CATEGORY_CHIPS}}': categoryChips,
   '{{FIND_INDEX}}': findIndex,
   '{{TOP_RATED}}': () => topRatedCards(6),
+  '{{HERO_BG}}': () => bgImage(heroListing(), 1800, 1000, true),
+  '{{HERO_CREDIT}}': () => {
+    const l = heroListing();
+    return l ? `<p class="hero-credit">Pictured: <a href="${l.url}">${esc(l.name)}</a>, ${esc(l.city)}, ${esc(l.stateCode)}</p>` : '';
+  },
+  '{{SPECIALITY_CIRCLES}}': specialityCircles,
+  '{{FEATURED_STATES}}': () => featuredStates(6),
   '{{BLOG_TEASERS}}': () => blogTeasers(posts),
   '{{STATE_LISTS}}': () => stateNames.filter((sn) => stateListicles.has(sn)).map((sn) => `<section class="state-lists"><h3><a href="${statePath(sn)}">${esc(sn)}</a></h3><ul>${stateListicles.get(sn).map((p) => `<li><a href="${p.path}">${esc(p.title)}</a></li>`).join('')}</ul></section>`).join('\n'),
   '{{BLOG_TEASERS_HOME}}': () => blogTeasers(posts.slice(0, 3)),
   '{{FAQ}}': () => faqHtml(faqs),
   '{{HTML_SITEMAP}}': htmlSitemap,
   '{{AD_DISPLAY}}': () => renderAdSlot('display'),
-  // Drop the banner photo at src/assets/img/hero-chocolate.jpg; until it
-  // exists the hero shows the logo mark rather than a broken image.
-  '{{HERO_IMAGE}}': () => (existsSync(join(SRC, 'assets/img/hero-chocolate.jpg'))
-    ? '<img src="/assets/img/hero-chocolate.jpg" alt="Broken pieces of dark chocolate with toasted nuts on a white table" width="1333" height="2000" fetchpriority="high" decoding="async">'
-    : '<img class="hero-mark" src="/assets/img/logo-mark.svg" alt="" width="320" height="320">'),
   '{{STAT_LISTINGS}}': () => num(stats.listings),
   '{{STAT_STATES}}': () => num(stats.states),
   '{{STAT_CITIES}}': () => num(stats.cities),
+  '{{STAT_SPECIALITIES}}': () => num(presentCategories.length),
   '{{CONTACT_EMAIL}}': () => CONTACT_EMAIL,
   '{{BUILD_DATE}}': () => BUILD_DATE,
   '{{SAMPLE_BANNER}}': () => (sampleCount === listings.length
@@ -1614,6 +1696,7 @@ const staticPages = readPageFiles(join(SRC, 'pages'));
 for (const page of staticPages) {
   const meta = { ...page.meta };
   for (const k of ['title', 'description', 'h1', 'lede']) if (meta[k]) meta[k] = expandTokens(meta[k]);
+  if (meta.layout !== 'raw' && !meta.feature) meta.feature = featureFigure(poolListing(meta.path), meta.path);
   const body = expandTokens(page.body);
   if (meta.path === '/404/') {
     // No canonical on the error page: it is served at whatever URL missed.
