@@ -8,7 +8,9 @@
 
   var points = JSON.parse(dataEl.textContent);
   el.innerHTML = '';
-  var map = L.map(el, { scrollWheelZoom: false });
+  // One-finger drags scroll the page on phones until the map is tapped.
+  var touch = L.Browser.mobile;
+  var map = L.map(el, { scrollWheelZoom: false, dragging: !touch, tap: !touch });
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     maxZoom: 18,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors'
@@ -28,5 +30,5 @@
   });
   if (bounds.length === 1) map.setView(bounds[0], 13);
   else map.fitBounds(bounds, { padding: [30, 30] });
-  map.on('click', function () { map.scrollWheelZoom.enable(); });
+  map.on('click', function () { map.scrollWheelZoom.enable(); map.dragging.enable(); });
 })();

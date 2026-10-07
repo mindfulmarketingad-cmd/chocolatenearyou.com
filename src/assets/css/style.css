@@ -588,3 +588,109 @@ h1 em, h2 em { font-style: italic; font-weight: 400; color: var(--cocoa-600); }
   .circle-label { font-size: 0.95rem; margin-top: 0.6rem; }
   .hero-inner { padding: 2.5rem 0 2.5rem; }
 }
+
+/* =====================================================================
+   Mobile
+   ===================================================================== */
+
+/* Long lists: the browser skips layout and paint for offscreen entries. */
+.entry { content-visibility: auto; contain-intrinsic-size: auto 560px; }
+.entry-compact { contain-intrinsic-size: auto 300px; }
+
+button, .btn, .chip, a { touch-action: manipulation; -webkit-tap-highlight-color: rgba(184, 135, 62, 0.18); }
+
+.to-top {
+  position: fixed; right: max(16px, env(safe-area-inset-right)); bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 40; width: 46px; height: 46px; border-radius: 50%; border: 0; cursor: pointer;
+  display: grid; place-items: center; background: var(--ganache); color: var(--gold-light);
+  box-shadow: var(--shadow-md); opacity: 0; transform: translateY(12px); pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.to-top.is-visible { opacity: 1; transform: none; pointer-events: auto; }
+
+.mobile-actions { display: none; }
+
+@media (max-width: 760px) {
+  body { font-size: 17.5px; }
+  .wrap, .wrap-narrow { width: min(100% - 2rem, var(--wrap)); }
+  .section { padding: 2rem 0; }
+  h2 { margin-top: 1.3em; }
+
+  /* inputs at 16px+ so iOS does not zoom on focus */
+  input, select, textarea { font-size: 16px !important; }
+  .toolbar { flex-direction: column; align-items: stretch; gap: 0.6rem; }
+  .toolbar-field input, .toolbar-field select { width: 100%; min-width: 0; min-height: 44px; }
+  .toolbar-check { min-height: 40px; padding: 0; }
+  .toolbar-count { margin: 0; }
+  .hero-search input, .hero-search .btn { min-height: 50px; }
+
+  /* tap targets: 44px for buttons, comfortable spacing for links */
+  .btn { min-height: 44px; }
+  .entry-actions { gap: 0.5rem; }
+  .entry-actions .btn { flex: 1 1 auto; }
+  .chip { padding: 0.45rem 0.95rem; min-height: 40px; }
+  .chips { gap: 0.5rem; }
+  .breadcrumbs a { display: inline-block; padding: 0.35rem 0; }
+  .footer-nav ul { gap: 0.1rem 1.25rem; }
+  .footer-nav a { display: inline-block; padding: 0.55rem 0; }
+  .social a { width: 44px; height: 44px; }
+  .city-grid li { padding: 0; }
+  .city-grid a { display: inline-block; padding: 0.55rem 0; }
+  .mini-list li, .link-list li, .map-index li, .state-lists li { padding: 0.3rem 0; }
+  .facts dd a, .rating-count { display: inline-block; padding: 0.2rem 0; }
+  .main-nav a { padding: 0.8rem 0.9rem; }
+  .faq summary { padding: 0.35rem 0; }
+
+  /* compact entries: photo floats beside the summary */
+  .entry-grid { display: block; }
+  .entry-media { float: right; width: 108px; margin: 0.2rem 0 0.6rem 0.9rem; }
+  .entry-media img { aspect-ratio: 1 / 1; border-radius: 10px; }
+  .entry-body::after { content: ""; display: table; clear: both; }
+  .entry-head h3 { font-size: 1.2rem; }
+  .entry { padding: 1.25rem 0; }
+  .facts { clear: both; }
+
+  .stat-strip { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+  .stat-strip li { min-width: 0; }
+
+  /* listing pages: sticky quick actions within thumb reach */
+  .listing-page { padding-bottom: calc(66px + env(safe-area-inset-bottom)); }
+  .listing-page .to-top { bottom: calc(80px + env(safe-area-inset-bottom)); }
+  .mobile-actions {
+    display: flex; position: fixed; left: 0; right: 0; bottom: 0; z-index: 45;
+    background: var(--ganache); padding: 0.55rem 0.75rem calc(0.55rem + env(safe-area-inset-bottom)); gap: 0.5rem;
+    box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.18);
+  }
+  .mobile-actions a {
+    flex: 1; display: grid; place-items: center; min-height: 46px; border-radius: 6px;
+    background: rgba(255, 255, 255, 0.08); color: #fff; text-decoration: none;
+    font-size: 0.8rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .mobile-actions a:first-child { background: var(--gold); }
+
+  /* maps */
+  .map-frame { height: 62vh; }
+  .leaflet-touch .leaflet-bar a { width: 42px; height: 42px; line-height: 42px; font-size: 20px; }
+
+  .ad-slot-display { min-height: 280px; }
+  .page-head { padding: 1.4rem 0 1.8rem; }
+  .ganache-stats b { font-size: 1.8rem; }
+}
+@media (min-width: 761px) { .map-hint { display: none; } }
+@media (max-width: 760px) {
+  .entry-head h3 a, .card h3 a, .post-card h3 a, .link-list a, .search-results a,
+  .state-lists a, .map-index a, .mini-list a, .map-index h3 a, .link-list h3 a, h3 > a {
+    display: inline-block; padding: 0.4rem 0;
+  }
+  .toolbar-check input { width: 24px; height: 24px; accent-color: var(--cocoa-700); }
+}
+/* anchor jumps land below the sticky header */
+[id] { scroll-margin-top: 92px; }
+.eyebrow a { color: inherit; text-decoration: none; }
+.eyebrow a:hover { text-decoration: underline; }
+.find-cta { margin-top: 2rem; }
+.find-index-title { margin-top: 3rem; }
+.find-grid li { position: relative; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+.find-grid li:hover { border-color: var(--gold); box-shadow: var(--shadow-sm); }
+.find-grid h2 a { text-decoration: none; color: var(--cocoa-900); }
+.find-grid h2 a::after { content: ""; position: absolute; inset: 0; }

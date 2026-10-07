@@ -295,8 +295,12 @@ function listingImage(l, size = 'card', { eager = false } = {}) {
   const fallback = fallbackImageFor(l);
   const photo = usablePhoto(l);
   const src = photo ? resizedPhotoUrl(photo, preset) : fallback;
+  // 2x variant for high-density phone screens; Google resizes on request.
+  const srcset = photo && photo.includes('googleusercontent.com') && size !== 'hero'
+    ? ` srcset="${attr(src)} 1x, ${attr(resizedPhotoUrl(photo, { width: preset.width * 2, height: preset.height * 2 }))} 2x"`
+    : '';
   const altText = photo ? `${l.name} in ${l.city}, ${l.stateCode}` : `Illustration standing in for a photo of ${l.name}`;
-  return `<img src="${attr(src)}" alt="${attr(altText)}" width="${preset.width}" height="${preset.height}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"${photo ? ` referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${fallback}';this.alt='';"` : ''}>`;
+  return `<img src="${attr(src)}"${srcset} alt="${attr(altText)}" width="${preset.width}" height="${preset.height}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"${photo ? ` referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${fallback}';this.alt='';"` : ''}>`;
 }
 
 /* ------------------------------------------------------- featured images
@@ -327,7 +331,9 @@ function featureFigure(l, seed = '') {
 function bgImage(l, width = 1600, height = 900, eager = false) {
   const photo = l && usablePhoto(l);
   if (!photo) return '';
-  return `<img class="bg-img" src="${attr(resizedPhotoUrl(photo, { width, height }))}" alt="" width="${width}" height="${height}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">`;
+  const small = resizedPhotoUrl(photo, { width: Math.round(width / 2), height: Math.round(height / 2) });
+  const large = resizedPhotoUrl(photo, { width, height });
+  return `<img class="bg-img" src="${attr(large)}" srcset="${attr(small)} ${Math.round(width / 2)}w, ${attr(large)} ${width}w" sizes="100vw" alt="" width="${width}" height="${height}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">`;
 }
 
 /* --------------------------------------------------------------- ranking */
@@ -1130,6 +1136,7 @@ for (const l of listings) {
     ),
     h1: l.name,
     layout: 'raw',
+    bodyClass: 'page listing-page',
     noindex: l.sample,
     trail: [
       { label: 'States', href: '/states/' },
@@ -1192,6 +1199,11 @@ for (const l of listings) {
     </aside>
   </div>
 </div>
+<nav class="mobile-actions" aria-label="Quick actions">
+  ${l.phone ? `<a href="${telHref(l.phone)}">Call</a>` : ''}
+  <a href="${directionsUrl(l)}" ${EXT}>Directions</a>
+  ${l.website ? `<a href="${attr(l.website)}" ${EXT}>Website</a>` : `<a href="${cityPath(l.state, l.city)}">More in ${esc(l.city)}</a>`}
+</nav>
 <div class="section section-alt">
   <div class="wrap">
     <h2>More chocolate near ${esc(l.name)}</h2>
@@ -1574,7 +1586,7 @@ for (const stateName of stateNames) {
   };
   const body = `<div class="map-frame" id="map" data-map-src="map-data" role="region" aria-label="Map of chocolate shops in ${attr(stateName)}"><p class="map-loading">Loading map...</p></div>
 <script type="application/json" id="map-data">${mapData(items)}</script>
-<p class="small">Map data &copy; OpenStreetMap contributors. Pin positions come from each business's public listing.</p>
+<p class="small map-hint">On a phone, tap the map once to pan and zoom it. Map data &copy; OpenStreetMap contributors. Pin positions come from each business's public listing.</p>
 <h2>Shops on this map, by city</h2>
 <div class="map-index">
 ${cities.map((c) => `  <section><h3><a href="${cityPath(stateName, c.city)}">${esc(c.city)}</a></h3><ul>${c.items.map((l) => `<li><a href="${l.url}">${esc(l.name)}</a></li>`).join('')}</ul></section>`).join('\n')}

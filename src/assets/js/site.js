@@ -17,6 +17,26 @@
     row.classList.add('is-today');
   });
 
+  // Back-to-top button on long pages (state lists run to hundreds of shops).
+  if (document.documentElement.scrollHeight > window.innerHeight * 4) {
+    var top = document.createElement('button');
+    top.type = 'button';
+    top.className = 'to-top';
+    top.setAttribute('aria-label', 'Back to top');
+    top.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>';
+    top.addEventListener('click', function () { window.scrollTo({ top: 0, behavior: 'smooth' }); });
+    document.body.appendChild(top);
+    var ticking = false;
+    window.addEventListener('scroll', function () {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(function () {
+        top.classList.toggle('is-visible', window.scrollY > window.innerHeight * 1.5);
+        ticking = false;
+      });
+    }, { passive: true });
+  }
+
   // One push per <ins>, after the page has parsed. Slots keep their
   // reserved height whether or not an ad fills.
   var slots = document.querySelectorAll('ins.adsbygoogle');
