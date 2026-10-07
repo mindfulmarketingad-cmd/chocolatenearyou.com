@@ -694,3 +694,25 @@ button, .btn, .chip, a { touch-action: manipulation; -webkit-tap-highlight-color
 .find-grid li:hover { border-color: var(--gold); box-shadow: var(--shadow-sm); }
 .find-grid h2 a { text-decoration: none; color: var(--cocoa-900); }
 .find-grid h2 a::after { content: ""; position: absolute; inset: 0; }
+
+/* sitewide affiliate banner, inside the announcement bar */
+.announce { padding: 0.5rem 1rem; }
+.announce-promo { color: #fff; font-weight: 600; display: inline-flex; align-items: center; gap: 0.6rem; }
+.announce-go {
+  background: var(--gold); color: #fff; border-radius: 3px; padding: 0.15rem 0.55rem;
+  font-size: 0.7rem; letter-spacing: 0.12em;
+}
+.announce-promo:hover .announce-go { background: #9d722f; }
+.announce-note { color: rgba(227, 196, 141, 0.75); font-size: 0.66rem; letter-spacing: 0.1em; }
+@media (max-width: 600px) {
+  .announce span.announce-note { display: inline; }
+  .announce-extra { display: none; }
+  .announce span.announce-go { display: inline; }
+  .announce-promo { padding: 0.35rem 0; }
+}
+@media (max-width: 600px) {
+  .announce { flex-wrap: nowrap; gap: 0.5rem; padding: 0.4rem 0.75rem; letter-spacing: 0.06em; }
+  .announce-promo { gap: 0.45rem; white-space: nowrap; }
+  .announce-go { padding: 0.15rem 0.45rem; letter-spacing: 0.08em; }
+  .announce-note { font-size: 0.6rem; letter-spacing: 0.04em; white-space: nowrap; }
+}

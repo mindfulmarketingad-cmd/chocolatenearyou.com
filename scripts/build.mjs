@@ -31,6 +31,9 @@ const SOCIAL = {
   twitter: 'https://twitter.com/chocolatenearyou',
   facebook: 'https://www.facebook.com/chocolatenearyou',
 };
+// Amazon Associates link for the sitewide "Order chocolate online" banner.
+const AFFILIATE_URL = 'https://amzn.to/4hJ3Eg1';
+const AFFILIATE_REL = 'target="_blank" rel="sponsored nofollow noopener noreferrer"';
 const ASSET_VERSION = String(Date.now()).slice(-6);
 const BUILD_DATE = new Date().toISOString().slice(0, 10);
 const NOW = Date.now();
@@ -817,7 +820,7 @@ function render(meta, body, opts = {}) {
     '{{CONTENT}}': content,
     '{{YEAR}}': String(new Date().getFullYear()),
     '{{ASSET_VERSION}}': ASSET_VERSION,
-    '{{ANNOUNCE}}': `<a href="/states/">${num(stats.listings)} chocolate shops ranked across ${num(stats.states)} states</a><span aria-hidden="true">&#10022;</span><span>Updated ${MONTH_YEAR}</span>`,
+    '{{ANNOUNCE}}': `<a class="announce-promo" href="${AFFILIATE_URL}" ${AFFILIATE_REL}>Order chocolate online <span class="announce-go">Shop now</span></a><span class="announce-note">Affiliate link</span><span class="announce-extra" aria-hidden="true">&#10022;</span><a class="announce-extra" href="/states/">${num(stats.listings)} shops ranked across ${num(stats.states)} states</a>`,
     '{{SOCIAL_INSTAGRAM}}': SOCIAL.instagram,
     '{{SOCIAL_TWITTER}}': SOCIAL.twitter,
     '{{SOCIAL_FACEBOOK}}': SOCIAL.facebook,
