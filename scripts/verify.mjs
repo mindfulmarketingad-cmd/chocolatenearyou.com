@@ -53,6 +53,7 @@ for (const file of files) {
 
   if (!isStub) {
     if (rel !== '/404.html' && !/class="(feature|detail-hero|hero)"/.test(html)) errors.push(`${rel}: no featured image`);
+    if (!html.includes("gtag('config', 'G-DLH6F7MN01')")) errors.push(`${rel}: missing GA4 tag`);
     const h1s = (html.match(/<h1[\s>]/g) || []).length;
     if (h1s !== 1) errors.push(`${rel}: ${h1s} h1 tags`);
     const title = (html.match(/<title>([^<]*)<\/title>/) || [])[1] || '';
